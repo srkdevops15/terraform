@@ -1,0 +1,145 @@
+1. Number
+Definition: A variable of type number holds numeric values. These can be integers or floating-point numbers.
+Usage: Used when you need to represent quantities, counts, or any other numerical data.
+Example:
+variable "instance_count" {
+  description = "Number of instances to create"
+  type        = number
+  default     = 1
+}
+how to use:
+resource "aws_instance" "example" {
+  count = var.instance_count  # This will create the specified number of EC2 instances.
+}
+
+2. String
+Definition: A variable of type string holds text values.
+Usage: Useful for names, identifiers, or any data that is purely textual.
+Example:
+
+variable "instance_type" {
+  description = "Type of the EC2 instance"
+  type        = string
+  default     = "t2.micro"
+}
+How to Use:
+resource "aws_instance" "example" {
+  instance_type = var.instance_type  # This assigns the instance type.
+}
+3. List
+Definition: A list is an ordered collection of values, all of the same type (e.g., all strings or all numbers).
+Usage: Useful when you want to group multiple items together, such as a list of security groups.
+Example:
+variable "security_groups" {
+  description = "List of security group names"
+  type        = list(string)
+  default     = ["default"]
+}
+How to Use:
+resource "aws_instance" "example" {
+  security_groups = var.security_groups  # This assigns multiple security groups to the instance.
+}
+4. Map
+Definition: A map is a collection of key-value pairs. Each key is unique and is associated with a value.
+Usage: Useful for representing structured data, such as tags or configuration settings.
+Example:
+variable "tags" {
+  description = "Map of tags to assign to the instance"
+  type        = map(string)
+  default     = {
+    Name        = "ExampleInstance"
+    Environment = "Development"
+  }
+}
+How to Use:
+resource "aws_instance" "example" {
+  tags = var.tags  # This assigns the tags to the EC2 instance.
+}
+
+--------------------------
+code and usage
+---------------------
+
+
+
+
+
+variable.tf
+-----------------------
+variable "instance_type" {
+  description = "Type of the EC2 instance"
+  default     = "t2.micro"
+}
+
+variable "instance_count" {
+  description = "Number of instances to create"
+  type        = number
+  default     = 1
+}
+
+
+variable "ami_id" {
+  description = "AMI ID for the instance"
+}
+
+
+variable "region" {
+  description = "AWS region to launch the instance"
+  default     = "us-east-1"
+}
+
+
+variable "security_groups" {
+  description = "List of security group names"
+  type        = list(string)
+  default     = ["default"]
+}
+
+variable "tags" {
+  description = "Map of tags to assign to the instance"
+  type        = map(string)
+  default     = {
+    Name        = "ExampleInstance"
+    Environment = "Development"
+  }
+}
+
+terraform.tfvars
+--------------------------------
+
+ami_id        = "ami-0c55b159cbfafe1f0"  # Replace with a valid AMI ID for your region     
+istance_count = 2                        # Number of instances to create
+security_groups = ["my-security-group" "othersg"]   # Example of a security group list
+tags = {                                   # Map of tags
+  Name        = "MyInstance"
+  Environment = "Production"
+}
+
+instanse.tf
+------------------------
+
+provider "aws" {
+  region = var.region
+}
+
+resource "aws_instance" "example" {
+  count         = var.instance_count      # Use the instance count variable
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  security_groups = var.security_groups    # Use the security groups list
+
+  tags = var.tags                          # Use the tags map
+}
+
+terraform plan -var-file="terraform.tfvars"
+
+
+
+
+
+
+
+
+
+
+
