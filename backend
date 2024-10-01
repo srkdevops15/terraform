@@ -1,0 +1,6 @@
+terraform {
+  backend "s3" {
+    bucket = "bucket-news3"  # Replace with your S3 bucket name
+    region = "us-east-1"  # Specify your AWS region
+  }
+}
