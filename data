@@ -1,0 +1,26 @@
+# Specify the AWS provider
+provider "aws" {
+  region = "us-east-1"  # Change this to your desired region
+}
+
+# Data source to find the latest Ubuntu 20.04 LTS AMI
+data "aws_ami" "latest_ubuntu" {
+  most_recent = true
+
+  owners = ["099720109477"]  # Canonical's account ID for Ubuntu
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]  # Pattern for Ubuntu 20.04
+  }
+}
+
+# Resource to create an EC2 instance using the retrieved AMI
+resource "aws_instance" "ubuntu_instance" {
+  ami           = data.aws_ami.latest_ubuntu.id  # Use the latest Ubuntu AMI
+  instance_type = "t2.micro"                       # Instance type
+
+  tags = {
+    Name = "MyUbuntuInstance"                       # Tag for the instance
+  }
+}
