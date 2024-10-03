@@ -22,3 +22,5 @@ resource "aws_instance" "example" {
     Environment = local.environment      # Reference the local environment
   }
 }
+
+
