@@ -1,0 +1,15 @@
+The terraform import command is used to bring existing infrastructure into Terraform's management. 
+It allows you to manage resources that were created outside of Terraform, such as resources created manually through the AWS Management Console or by another tool. 
+Importing resources enables you to manage them with Terraform by creating a configuration that matches the existing infrastructure.
+
+provider "aws" {
+  region = "us-east-1"  # Make sure to specify the correct region
+}
+
+
+resource "aws_instance" "example" {
+  # No arguments are needed here for import
+}
+
+terraform init
+terraform import aws_instance.example i-081c67223a4634792
