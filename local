@@ -1,0 +1,24 @@
+Locals are a feature in Terraform that allow you to define named values that can be reused throughout your configuration. 
+They help in maintaining cleaner and more manageable code by reducing redundancy and improving readability.
+
+# locals.tf
+locals {
+  region         = "us-east-1"        # AWS region
+  instance_type  = "t2.micro"          # EC2 instance type
+  ami_id         = "ami-12345678"      # Example AMI ID
+  environment     = "production"        # Environment tag
+}
+# main.tf
+provider "aws" {
+  region = local.region  # Use the local value for the region
+}
+
+resource "aws_instance" "example" {
+  ami           = local.ami_id          # Reference the local AMI ID
+  instance_type = local.instance_type   # Reference the local instance type
+
+  tags = {
+    Name        = "ExampleInstance"     # Tag for the instance
+    Environment = local.environment      # Reference the local environment
+  }
+}
