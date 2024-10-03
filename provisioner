@@ -1,0 +1,106 @@
+Provisioners in Terraform are used to execute scripts or commands on a resource after it has been created or updated. 
+They allow you to perform actions that require knowledge of the resource's current state or to configure resources post-creation.
+
+Types of Provisioners
+Terraform provides several types of provisioners, each serving different use cases:
+
+local-exec:
+
+Executes a command on the machine where Terraform is being run (local machine).
+Useful for running scripts or commands that do not need direct interaction with the resource being managed.
+Example:
+
+provisioner "local-exec" {
+  command = "echo 'Instance created with IP: ${self.public_ip}'"
+}
+
+remote-exec:
+
+Executes a command on a remote resource via SSH or WinRM.
+Used for configuring or installing software on an instance after it has been created.
+Example:
+
+provisioner "remote-exec" {
+  inline = [
+    "sudo apt-get update",
+    "sudo apt-get install -y nginx",
+  ]
+
+  connection {
+    type        = "ssh"
+    host        = self.public_ip
+    user        = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
+  }
+}
+
+file:
+
+Copies files or directories from the local machine to a remote resource.
+Useful for transferring configuration files or scripts needed for setup.
+Example:
+
+
+provisioner "file" {
+  source      = "local_file.txt"
+  destination = "/home/ubuntu/remote_file.txt"
+}
+
+Usage Scenarios
+Configuration Management:
+
+After creating an instance, you might want to install software or configure it (using remote-exec).
+Resource Initialization:
+
+Run a script that sets up your environment or initializes your application after the resource is up.
+Local Scripts:
+
+Use local-exec to run local commands or scripts that don't require interaction with the created resources.
+Important Considerations
+
+
+code
+-------------------
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# Create a key pair
+resource "aws_key_pair" "my_key" {
+  key_name   = "my_key_pair"                  # Name of the key pair
+  public_key = file("/home/ubuntu/.ssh/id_rsa.pub")  # Ensure this path is correct
+}
+
+# Create an EC2 instance
+resource "aws_instance" "web" {
+  ami           = "ami-0ebfd941bbafe70c6"  # Specified AMI ID
+  instance_type = var.instance_type
+  key_name      = aws_key_pair.my_key.key_name  # Use the created key pair
+
+  # Provisioner to install Nginx
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y nginx",
+      "sudo systemctl start nginx",
+      "sudo systemctl enable nginx"
+    ]
+
+    connection {
+      type        = "ssh"
+      host        = self.public_ip
+      user        = "ubuntu"  # Change this based on your AMI's default user
+      private_key = file("/home/ubuntu/.ssh/id_rsa")  # Ensure this path is correct
+    }
+  }
+
+  # Local-exec provisioner to output a message
+  provisioner "local-exec" {
+    command = "echo 'Nginx has been installed on ${self.public_ip}'"
+  }
+
+  tags = {
+    Name = "WebServer"
+  }
+}
