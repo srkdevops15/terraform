@@ -1,3 +1,5 @@
+In Terraform, a data block is used to define and retrieve data from existing resources in your infrastructure. This is particularly useful when you want to reference resources that are not managed by your Terraform configuration but are still relevant for the resources you want to create or modify.
+
 # Specify the AWS provider
 provider "aws" {
   region = "us-east-1"  # Change this to your desired region
